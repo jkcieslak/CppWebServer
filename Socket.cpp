@@ -1,4 +1,6 @@
 #include "Socket.h"
+#include "Matcher.h"
+#include "Controller.h"
 #include <iostream>
 #include <exception>
 #include <arpa/inet.h>
@@ -6,6 +8,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <thread>
+#include <sstream>
 
 Socket::Socket(int domain, int socketType, int protocol, in_addr_t internetAddress, int portNumber) {
     this->logger = new Logger(std::cout, DEBUG);
@@ -18,6 +21,10 @@ Socket::Socket(int domain, int socketType, int protocol, in_addr_t internetAddre
         this->logger->error(e.what());
         std::terminate();
     }
+}
+
+Socket::~Socket() {
+    delete this->logger;
 }
 
 Socket& Socket::createSocketFileDescriptor(int domain, int socketType, int protocol) {
@@ -69,11 +76,28 @@ void* Socket::handleClient(void* arg) {
     if(bytes_received > 0) {
         logger->info("Data received.");
         //check if request is GET
-        regex_t regex;
+        /*regex_t regex;
         regcomp(&regex, "^GET /([^ ]*) HTTP/1", REG_EXTENDED);
-        regmatch_t matches[2];
+        regmatch_t matches[2];*/
+        //new way
+        std::string* responseString = new std::string();
+        std::string* request = new std::string(buffer);
+        try {
+            Route matchedRoute = Matcher::matchRoute(*request);
+            *responseString = matchedRoute.getResponseString();
+        } catch (std::runtime_error& e) {
+            logger->warning("Unable to match route for request");
+            *responseString = Controller::notFoundResponse();
+        }
 
-        if(regexec(&regex, buffer, 2, matches, 0) == 0) {
+        char* textResponse = new char[responseString->length() +1 ];
+        strcpy(textResponse, responseString->c_str());
+        size_t responseLength = strlen(textResponse);
+
+        logger->info("Sending response data.");
+        send(clientFileDescriptor, textResponse, responseLength, 0);
+
+        /*if(regexec(&regex, buffer, 2, matches, 0) == 0) {
             size_t response_len;
             const char* textResponse =
                     "HTTP/1.0 200 OK\r\n"
@@ -94,8 +118,8 @@ void* Socket::handleClient(void* arg) {
 
             logger->info("Sending response data.");
             send(clientFileDescriptor, textResponse, response_len, 0);
-        }
-        regfree(&regex);
+        }*/
+//        regfree(&regex);
     }
     close(clientFileDescriptor);
     free(arg);

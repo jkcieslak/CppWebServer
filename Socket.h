@@ -17,6 +17,7 @@ private:
 public:
     explicit Socket(int domain = AF_INET, int socketType = SOCK_STREAM, int protocol = 0,
            in_addr_t internetAddress = INADDR_ANY, int portNumber = 8080);
+    ~Socket();
     Socket& bindSocket();
     Socket& listenForConnections(int maxConnectionsNumber);
     Socket& handleConnections();
