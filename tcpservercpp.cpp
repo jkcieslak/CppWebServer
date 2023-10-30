@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
     Matcher matcher = Matcher::getInstance();
     matcher.addRoute(*route).addRoute(*route2);
 
-    logger->debug(route->getRegexString());
-    logger->debug(route2->getRegexString());
+    logger->debug(route->getMatchString());
+    logger->debug(route2->getMatchString());
 
     try {
         socketInV4->bindSocket().listenForConnections(10).handleConnections();

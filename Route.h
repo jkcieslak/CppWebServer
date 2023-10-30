@@ -26,14 +26,14 @@ private:
     std::string routeName;
     std::string (*controllerFunctionPointer)(std::vector<std::string>);
     std::vector<std::string> controllerFunctionArgs;
-    std::string regexString;
+    std::string matchString;
 public:
     Route(HTTP_METHOD httpMethod, std::string subUrl, std::string name,
           std::string (*controllerFunctionPointer)(std::vector<std::string>),
           std::vector<std::string> routeArgs);
-    std::string getRegexString();
+    std::string getMatchString();
     std::string getResponseString(std::vector<std::string> args = std::vector<std::string>());
-    bool doesRegexMatch(std::string);
+    bool doesSubUrlMatch(std::string);
 };
 
 #endif //WEBSERVER_ROUTE_H

@@ -15,20 +15,23 @@ Route::Route(HTTP_METHOD httpMethod, std::string subUrl, std::string name,std::s
                            "\\{[^}]*\\}");
     }
 
-    this->regexString = this->httpMethodName[httpMethod] + " " + regexRoute + " HTTP/1";
+    this->matchString = this->httpMethodName[httpMethod] + " " + regexRoute + " HTTP/1";
             //"^GET /([^ ]*) HTTP/1.1"
 }
 
-std::string Route::getRegexString() {
-    return this->regexString;
+std::string Route::getMatchString() {
+    return this->matchString;
 }
 
 std::string Route::getResponseString(std::vector<std::string> args) {
     return this->controllerFunctionPointer(std::move(args));
 }
 
-bool Route::doesRegexMatch(std::string) {
-//    std::regex regExpr = this->regexString;
+bool Route::doesSubUrlMatch(std::string subUrl) {
+    for(int i = 0; i < subUrl.length(); i++) {
+        this->getMatchString()[i] == subUrl[i];
+    }
+
     return false;
 }
 

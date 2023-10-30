@@ -56,7 +56,7 @@ Matcher& Matcher::addPatchRoute(std::string subUrl, std::string name, std::strin
 
 Route Matcher::matchRoute(std::string subUrl) {
     for(auto & route : *Matcher::getInstance().routeList) {
-        if(subUrl.find(route.getRegexString()) != std::string::npos)
+        if(subUrl.find(route.getMatchString()) != std::string::npos)
             return route;
     }
     throw std::runtime_error("404 Not Found");
